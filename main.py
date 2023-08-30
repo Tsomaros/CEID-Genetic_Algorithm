@@ -7,7 +7,7 @@ from numpy.random import rand
 from sklearn.preprocessing import MinMaxScaler
 from numpy.linalg import norm
 
-
+# Finds the mean value of each sensor for every class
 def FindMeanOfSensors(df):
     means = []
     for i in range(1, 6):
@@ -17,9 +17,8 @@ def FindMeanOfSensors(df):
         means.append(temp)
     return means
 
-
+#Generates random initial population
 def initial_population(n_pop, n_bit, n_crom,):
-    # initial population of random bitstring
     pop = []
     for i in range(n_pop):
         temp = []
@@ -30,7 +29,7 @@ def initial_population(n_pop, n_bit, n_crom,):
         pop.append(temp)
     return pop
 
-
+#Converts binary to desimal
 def FindDecimal(population, n_bit):
     decimal = []
     for i in range(len(population)):
@@ -40,7 +39,7 @@ def FindDecimal(population, n_bit):
         decimal.append(temp)
     return decimal
 
-
+#evaluate population
 def eval(population, MeanSensors, n_pop, n_bit, c):
     scores = []
     for i in range(n_pop):
@@ -58,7 +57,7 @@ def eval(population, MeanSensors, n_pop, n_bit, c):
 
     return scores
 
-
+#Select parents with tournament selection
 def Selection(population, scores, K=3):
     selection_ix = randint(len(population))
     for ix in randint(0, len(population), K - 1):
@@ -67,7 +66,7 @@ def Selection(population, scores, K=3):
             selection_ix = ix
     return population[selection_ix]
 
-
+#Uniform Crossover
 def Uniform_crossover(p1, p2, r_cross, n_crom):
     # children are copies of parents by default
     c1, c2 = p1.copy(), p2.copy()
@@ -96,6 +95,7 @@ def Uniform_crossover(p1, p2, r_cross, n_crom):
 
     return [chl1, chl2]
 
+#mutation function
 def mutation(K, r_mut):
     for i in range(len(K)):
         temp = list(K[i])
@@ -114,11 +114,11 @@ def mutation(K, r_mut):
 def genetic_algorithm(n_bit, n_iter, n_pop, r_cross, r_mut, c, n_crom):
     #initial population
     population = initial_population(n_pop, n_bit, n_crom)
+    best, best_eval = 0, 0
 
     for gen in range(n_iter):
         #evaluate population
         scores = eval(population, MeanSensors, n_pop, n_bit, c)
-        best, best_eval = 0, 0
         #find best score
         for i in range(n_pop):
             if scores[i] > best_eval:
@@ -144,21 +144,6 @@ def genetic_algorithm(n_bit, n_iter, n_pop, r_cross, r_mut, c, n_crom):
 
 
 
-
-data = ""
-with open("dataset-HAR-PUC-Rio.csv") as file:
-    data = file.read()
-data = data.replace(',','.').replace(';',',')
-
-x = open("new_dataset.csv","w")
-x.writelines(data)
-x.close()
-
-
-df = pd.read_csv("new_dataset.csv")
-df = df.drop(['user', 'gender', 'age', 'how_tall_in_meters', 'weight', 'body_mass_index'], axis=1)
-df['class'].replace(['sittingdown', 'standingup', 'standing', 'walking', 'sitting'], [1, 2, 3, 4, 5], inplace=True)
-df.to_csv('new_dataset.csv', index=False, encoding="utf-8-sig")
 
 df = pd.read_csv("new_dataset.csv")
 
