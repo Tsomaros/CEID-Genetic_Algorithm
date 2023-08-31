@@ -66,6 +66,8 @@ def Selection(population, scores, K=3):
             selection_ix = ix
     return population[selection_ix]
 
+
+
 #Uniform Crossover
 def Uniform_crossover(p1, p2, r_cross, n_crom):
     # children are copies of parents by default
@@ -114,28 +116,31 @@ def mutation(K, r_mut):
 def genetic_algorithm(n_bit, n_iter, n_pop, r_cross, r_mut, c, n_crom):
     #initial population
     population = initial_population(n_pop, n_bit, n_crom)
+
     best, best_eval = 0, 0
 
     for gen in range(n_iter):
         #evaluate population
         scores = eval(population, MeanSensors, n_pop, n_bit, c)
+        #best, best_eval = 0, 0
         #find best score
         for i in range(n_pop):
             if scores[i] > best_eval:
                 best, best_eval = population[i], scores[i]
-                print(">%d, new best f(%s) = %.3f" % (gen, population[i], scores[i]))
+                #print(">%d, new best f(%s) = %.3f" % (gen, population[i], scores[i]))
         #select parents
         selected = [Selection(population, scores) for _ in range(n_pop)]
 
         children = []
 
         for j in range(0, n_pop, 2):
-            # get selected parents in pairs
+            #get selected parents
             p1, p2 = selected[j], selected[j + 1]
             # crossover parents
             for k in Uniform_crossover(p1, p2, r_cross, n_crom):
                 #mutation
                 mutation(k, r_mut)
+
                 children.append(k)
         # replace population
         population = children
@@ -171,18 +176,22 @@ scores = []
 
 for i in range(10):
     best, score = genetic_algorithm(n_bit, n_iter, n_pop, r_cross, r_mut, c, n_crom)
+    print('Done:', i)
+    print('f(%s) = %f' % (best, score))
+    decimal = FindDecimal(best, n_bit)
+    decimal = np.reshape(decimal, (1, -1))
+    decimal = scaler.inverse_transform(decimal)
+    Mean = np.reshape(MeanSensors[4], (1, -1))
+    Mean = scaler.inverse_transform(Mean)
+    print('Mean of sitting sensors')
+    print(Mean)
+    print('Best')
+    print(decimal)
     scores.append(score)
 
 print(score.mean())
 
-#print('Done!')
-#print('f(%s) = %f' % (best, score))
-#decimal = FindDecimal(best, n_bit)
-#decimal = np.reshape(decimal, (1, -1))
-#decimal = scaler.inverse_transform(decimal)
-#Mean = np.reshape(MeanSensors[4], (1, -1))
-#Mean = scaler.inverse_transform(Mean)
-#print(Mean)
-#print(decimal)
+
+
 
 
